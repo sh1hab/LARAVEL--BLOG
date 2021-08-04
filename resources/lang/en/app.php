@@ -1,19 +1,6 @@
 <?php
 
 return [
-
-    'comment' => [
-        'already_created' => 'Comment already created!',
-        'create' => [
-            'success' => 'Comment created successfully',
-        ],
-        'update' => [
-            'success' => 'Comment updated successfully',
-        ],
-        'cancel' => [
-            'success' => 'Comment cancelled successfully',
-        ]
-    ],
     'create' => [
         'success' => 'Successfully saved data!',
     ],
@@ -37,14 +24,21 @@ return [
     'login-validation' => [
         'email' => 'The :attribute must be a valid email address.'
     ],
-
     'password' => [
-        'not_valid' => 'Your password isn\'t valid',
+        'not_valid' => 'Your Email or Password isn\'t valid',
     ],
     'reset_password' => [
         'success' => 'Reset password success'
     ],
     'success' => 'Success!',
+    'status' => [
+        'not_validated' => 'Not Validated',
+        'not_authorized' => 'Unauthorized',
+        'not_found' => 'Not Found',
+        'internal_error' => 'Some error occurred, please try again',
+        'forbidden' => 'You have no permission for the action',
+        'bad_gateway' => 'Failed to save data create or update',
+    ],
     'token' => [
         'not_valid' => 'Not valid token!',
     ],
