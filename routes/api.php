@@ -1,7 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +16,24 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+
+Route::group([
+    'prefix' => 'auth'
+], function () {
+    Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth:api', 'isActiveToken']);
+});
+
+Route::group([
+    'middleware' => ['auth:api', 'isActiveToken', 'roles'],
+    'roles' => ['admin', 'manager', 'user']
+], function () {
+    Route::resource('/posts', PostController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
+});
+
+Route::group([
+    'middleware' => ['auth:api', 'isActiveToken', 'roles'],
+    'roles' => ['admin']
+], function () {
+    Route::resource('/users', UserController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
 });
