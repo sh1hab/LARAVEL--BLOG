@@ -24,6 +24,9 @@ return [
     'login-validation' => [
         'email' => 'The :attribute must be a valid email address.'
     ],
+    'post' => [
+        'not_found' => 'The post associated with this id :attribute not found.'
+    ],
     'password' => [
         'not_valid' => 'Your Email or Password isn\'t valid',
     ],
@@ -41,9 +44,10 @@ return [
     ],
     'token' => [
         'not_valid' => 'Not valid token!',
+        'expired' => 'Token time has expired. Please log in again.'
     ],
     'user' => [
-        'not_found' => 'This user is not found',
+        'not_found' => 'This user associated with this id :attribute not found.',
         'not_valid' => 'Not valid User!',
         'in_active' => 'This user is inactive. Please contact to the admin',
         'registered' => 'This user already registered!',
@@ -56,7 +60,7 @@ return [
             'failed' => 'User verified failed!'
         ],
         'role' => [
-            'forbidden' => 'You have no permission for the action'
+            'forbidden' => 'Permission Denied'
         ],
     ],
     'update' => [
