@@ -25,4 +25,4 @@ The following are to be considered when running this Application:
 https://documenter.getpostman.com/view/14023069/TzskE3b4 Here is the API Documentation
 
 ### Tests 
-Added Tests in tests/feature folder
+Run the <code>php artisan test</code> to run the tests 
