@@ -3,7 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Post;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class PostObserver
 {
@@ -12,7 +12,7 @@ class PostObserver
     /**
      * Handle the Post "creating" event.
      *
-     * @param  \App\Models\Post  $user
+     * @param Post $post
      * @return void
      */
     public function creating(Post $post)
@@ -23,7 +23,7 @@ class PostObserver
     /**
      * Handle the Post "updating" event.
      *
-     * @param  \App\Models\Post  $user
+     * @param Post $post
      * @return void
      */
     public function updating(Post $post)
@@ -34,7 +34,7 @@ class PostObserver
     /**
      * Handle the Post "deleted" event.
      *
-     * @param  \App\Models\Post  $user
+     * @param Post $post
      * @return void
      */
     public function deleted(Post $post)

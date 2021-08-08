@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use App\Enums\UserTypes;
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
 
 class UserTest extends TestCase
 {
@@ -48,7 +48,7 @@ class UserTest extends TestCase
             ->create([
                 'password' => bcrypt($password),
                 'role_id' => Role::factory()->create([
-                    'name' =>  UserTypes::admin,
+                    'name' => UserTypes::admin,
                 ]),
             ]);
 
@@ -76,7 +76,7 @@ class UserTest extends TestCase
             ->create([
                 'password' => bcrypt($password),
                 'role_id' => Role::factory()->create([
-                    'name' =>  UserTypes::admin,
+                    'name' => UserTypes::admin,
                 ]),
             ]);
 
@@ -90,11 +90,13 @@ class UserTest extends TestCase
         $token = $response->data->token;
         $headers = ['Authorization' => "Bearer {$token}"];
 
+        $password = $this->faker->password;
         $data = [
             'user_type' => UserTypes::getUserTypesArray()[mt_rand(0, count(UserTypes::getUserTypesArray()) - 1)],
             'name' => $this->faker->name,
             'email' => $this->faker->email,
-            'password' => $this->faker->password,
+            'password' => $password,
+            'password_confirmation' => $password,
         ];
         $response = $this->json('POST', '/api/v1/users', $data, $headers);
         $response->assertStatus(201)
@@ -180,12 +182,16 @@ class UserTest extends TestCase
         $response = json_decode($response->getContent());
         $token = $response->data->token;
         $headers = ['Authorization' => "Bearer {$token}"];
+
+        $password = $this->faker->password;
         $data = [
             'user_type' => UserTypes::getUserTypesArray()[mt_rand(0, count(UserTypes::getUserTypesArray()) - 1)],
             'name' => $this->faker->name,
             'email' => $this->faker->email,
-            'password' => $this->faker->password,
+            'password' => $password,
+            'password_confirmation' => $password,
         ];
+
         $response = $this->json('POST', '/api/v1/users', $data, $headers);
         $response = json_decode($response->getContent());
 

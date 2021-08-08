@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use App\Enums\UserTypes;
+use App\Models\Post;
 use App\Models\Role;
 use App\Models\User;
-use App\Models\Post;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
 
 
 class PostTest extends TestCase
@@ -187,9 +187,11 @@ class PostTest extends TestCase
         $token = $response->data->token;
         $headers = ['Authorization' => "Bearer {$token}"];
 
-        $post = Post::factory()->create([
-            'created_by' => $user->id
-        ]);
+        $post = Post::withoutEvents(function () use ($user) {
+            return Post::factory()->create([
+                'created_by' => $user->id,
+            ]);
+        });
 
         $data = [
             'title' => $this->faker->name,

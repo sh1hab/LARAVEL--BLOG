@@ -2,8 +2,6 @@
 
 namespace App\Transformers;
 
-use App\Transformers\Transformer;
-
 class PostTransformer extends Transformer
 {
     /**
@@ -14,14 +12,13 @@ class PostTransformer extends Transformer
      */
     public function transform(array $item)
     {
-        $transformedItem = [
+        return [
             'id' => $item['id'],
             'title' => $item['title'],
             'content' => $item['content'],
             'slug' => $item['slug'],
-            'upload' => $item['upload']
+            'upload' => $item['upload'] ?? null,
+            'author' => $item['author'] ?? null,
         ];
-
-        return $transformedItem;
     }
 }

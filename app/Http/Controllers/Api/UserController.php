@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Traits\RespondTrait;
+use App\Models\Role;
+use App\Models\User;
+use App\Transformers\PaginationTransformer;
+use App\Transformers\UserTransformer;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Controllers\Controller;
-use App\Transformers\UserTransformer;
-use App\Transformers\PaginationTransformer;
-use App\Http\Traits\RespondTrait;
-use App\Models\User;
-use App\Models\Role;
+use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
@@ -28,11 +31,12 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return JsonResponse
      */
     public function index(Request $request)
     {
-        $paginatedData = User::with('role:id,name')->paginate($request->input('per_page') ?? $this->paginate)->toArray();
+        $paginatedData = User::with(['role'])->paginate($request->input('per_page') ?? $this->paginate)->toArray();
 
         $users = $paginatedData['data'];
         unset($paginatedData['data']);
@@ -46,14 +50,15 @@ class UserController extends Controller
                 'users' => $transformedData,
                 'pagination' => $this->paginationTransformer->transform($paginatedData)
             ]
-        ], 200);
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
      */
     public function store(Request $request)
     {
@@ -61,7 +66,7 @@ class UserController extends Controller
             'user_type' => "required|string|in:user,manager,admin",
             'name' => 'required|min:3|max:255',
             'email' => 'required|email|unique:users|max:255',
-            'password' => 'required|min:6|max:255'
+            'password' => 'required|confirmed|min:6|max:255'
         ]);
 
         if ($validator->fails()) {
@@ -80,6 +85,9 @@ class UserController extends Controller
             $user->password = bcrypt($validatedData['password']);
             $user->save();
 
+            $id = $user->id;
+            $user = User::where('id', $id)->with(['role'])->first();
+
             DB::commit();
 
             return response()->json([
@@ -89,7 +97,7 @@ class UserController extends Controller
                     'user' => $user,
                 ]
             ], 201);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
 
             return $this->respondInternalError('', $e->getMessage());
@@ -104,7 +112,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = User::where('id', $id)->with(['author'])->first();
+        $user = User::where('id', $id)->with(['role'])->first();
         if (empty($user)) {
             return $this->respondNotFound('', __('app.user.not_found', ['attribute' => $id]));
         }
@@ -115,19 +123,20 @@ class UserController extends Controller
             'data' => [
                 'user' => $user
             ]
-        ], 200);
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     * @throws ValidationException
      */
     public function update(Request $request, $id)
     {
-        $user = User::where('id', $id)->first();
+        $user = User::where('id', $id)->with('role')->first();
 
         if (empty($user)) {
             return $this->respondNotFound('', __('app.user.not_found'));
@@ -137,7 +146,7 @@ class UserController extends Controller
             'user_type' => "required|string|in:user,manager,admin",
             'name' => 'required|min:3|max:255',
             'email' => 'required|max:255|unique:users,id,' . $id,
-            'password' => 'required|min:6|max:255'
+            'password' => 'required|confirmed|min:6|max:255'
         ]);
 
         if ($validator->fails()) {
@@ -164,7 +173,7 @@ class UserController extends Controller
                     'user' => $user
                 ]
             ], 200);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
 
             return $this->respondInternalError('', $e->getMessage());
@@ -174,8 +183,8 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return JsonResponse
      */
     public function destroy($id)
     {
@@ -195,7 +204,7 @@ class UserController extends Controller
                     'user' => []
                 ]
             ], 200);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
 
             return $this->respondInternalError('', $e->getMessage());

@@ -2,9 +2,6 @@
 
 namespace App\Transformers;
 
-use App\Transformers\Transformer;
-
-
 class PaginationTransformer extends Transformer
 {
     /**
@@ -15,7 +12,7 @@ class PaginationTransformer extends Transformer
      */
     public function transform(array $item)
     {
-        $transformedItem = [
+        return [
             'first_page_url' => $item['first_page_url'],
             'from' => $item['from'],
             'last_page' => $item['last_page'],
@@ -27,7 +24,5 @@ class PaginationTransformer extends Transformer
             'to' => $item['to'],
             'total' => $item['total']
         ];
-
-        return $transformedItem;
     }
 }

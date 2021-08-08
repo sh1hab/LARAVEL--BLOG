@@ -2,8 +2,6 @@
 
 namespace App\Transformers;
 
-use App\Transformers\Transformer;
-
 class UserTransformer extends Transformer
 {
     /**
@@ -14,14 +12,12 @@ class UserTransformer extends Transformer
      */
     public function transform(array $item)
     {
-        $transformedItem = [
+        return [
             'id' => $item['id'],
             'name' => $item['name'],
             'email' => $item['email'],
             'role_id' => $item['role_id'],
             'role' => $item['role'],
         ];
-
-        return $transformedItem;
     }
 }

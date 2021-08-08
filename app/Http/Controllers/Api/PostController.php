@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
-use App\Transformers\PostTransformer;
-use App\Transformers\PaginationTransformer;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\DB;
-use App\Models\Post;
-use App\Http\Controllers\Controller;
-use App\Http\Traits\UploadTrait;
-use App\Http\Traits\RespondTrait;
-use Auth;
 use App\Enums\UserTypes;
+use App\Http\Controllers\Controller;
+use App\Http\Traits\RespondTrait;
+use App\Http\Traits\UploadTrait;
+use App\Models\Post;
+use App\Transformers\PaginationTransformer;
+use App\Transformers\PostTransformer;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class PostController extends Controller
 {
@@ -30,12 +32,17 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
     public function index(Request $request)
     {
-        $paginatedData = Post::with('upload')->paginate($request->input('per_page') ?? $this->paginate)->toArray();
+        $query = Post::with(['author', 'upload']);
 
+        if(Auth::user()->role->name ==  UserTypes::user){
+            $query = $query->createdBy(Auth::user()->id);
+        }
+
+        $paginatedData = $query->paginate($request->input('per_page') ?? $this->paginate)->toArray();
         $posts = $paginatedData['data'];
         unset($paginatedData['data']);
         $transformedData = $this->postTransformer
@@ -48,14 +55,15 @@ class PostController extends Controller
                 'posts' => $transformedData,
                 'pagination' => $this->paginationTransformer->transform($paginatedData)
             ]
-        ], 200);
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
      */
     public function store(Request $request)
     {
@@ -63,7 +71,7 @@ class PostController extends Controller
             'title' => 'required|min:3|max:255|unique:posts,title',
             'content' => 'required|min:3',
             'slug' => 'required|min:3|max:255|unique:posts,slug',
-            'post_image' => 'image'
+            'post_image' => 'image|mimes:jpeg,png'
         ]);
 
         if ($validator->fails()) {
@@ -90,7 +98,7 @@ class PostController extends Controller
 
             $post->save();
 
-            $post = Post::where('id', $post->id)->with('upload')->first();
+            $post = Post::where('id', $post->id)->with(['author', 'upload'])->first();
 
             DB::commit();
             return response()->json([
@@ -100,7 +108,7 @@ class PostController extends Controller
                     'post' => $post,
                 ]
             ], 201);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
 
             return $this->respondInternalError('', $e->getMessage());
@@ -130,19 +138,20 @@ class PostController extends Controller
             'data' => [
                 'post' => $post
             ]
-        ], 200);
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     * @throws ValidationException
      */
     public function update(Request $request, $id)
     {
-        $post = Post::where('id', $id)->with('upload')->first();
+        $post = Post::where('id', $id)->with(['author', 'upload'])->first();
 
         if (empty($post)) {
             return $this->respondNotFound('', __('app.post.not_found', ['attribute' => $id]));
@@ -156,7 +165,7 @@ class PostController extends Controller
             'title' => 'required|min:3|max:255|unique:posts,title,' . $id,
             'content' => 'required|min:3',
             'slug' => 'required|min:3|max:255|unique:posts,slug,' . $id,
-            'post_image' => 'image'
+            'post_image' => 'image|mimes:jpeg,png'
         ]);
 
         if ($validator->fails()) {
@@ -190,8 +199,8 @@ class PostController extends Controller
                 'data' => [
                     'post' => $post,
                 ]
-            ], 200);
-        } catch (Exception $e) {
+            ]);
+        } catch (\Exception $e) {
             DB::rollback();
 
             return $this->respondInternalError('', $e->getMessage());
@@ -201,8 +210,8 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return JsonResponse
      */
     public function destroy($id)
     {
@@ -225,8 +234,8 @@ class PostController extends Controller
                 'data' => [
                     'post' => []
                 ]
-            ], 200);
-        } catch (Exception $e) {
+            ]);
+        } catch (\Exception $e) {
             DB::rollback();
 
             return $this->respondInternalError('', $e->getMessage());

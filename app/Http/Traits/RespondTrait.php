@@ -14,62 +14,12 @@ trait RespondTrait
     /**
      * @param string $message
      * @param string $errors
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function respondNotValidated($message = '', $errors = '')
     {
         $message = $message === '' ? __('app.status.not_validated') : $message;
         return $this->setStatusCode(400)->respondWithError($message, $errors);
-    }
-
-    /**
-     * @param string $message
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function respondNotAuthorized($message = '', $errors = '')
-    {
-        $message = $message === '' ? __('app.status.not_authorized') : $message;
-        return $this->setStatusCode(401)->respondWithError($message, $errors);
-    }
-
-    /**
-     * @param string $message
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function respondNotFound($message = '', $errors = '')
-    {
-        $message = $message === '' ? __('app.status.not_found') : $message;
-        return $this->setStatusCode(200)->respondWithError($message, $errors);
-    }
-
-    /**
-     * @param string $message
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function respondInternalError($message = '', $errors = '')
-    {
-        $message = $message === '' ? __('app.status.internal_error') : $message;
-        return $this->setStatusCode(500)->respondWithError($message, $errors);
-    }
-
-    /**
-     * @param string $message
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function respondForbidden($message = '', $errors = '')
-    {
-        $message = $message === '' ? __('app.status.forbidden') : $message;
-        return $this->setStatusCode(403)->respondWithError($message, $errors);
-    }
-
-    /**
-     * @param string $message
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function respondBadGateway($message = '', $errors = '')
-    {
-        $message = $message === '' ? __('app.status.bad_gateway') : $message;
-        return $this->setStatusCode(502)->respondWithError($message, $errors);
     }
 
     /**
@@ -113,5 +63,55 @@ trait RespondTrait
         $this->statusCode = $statusCode;
 
         return $this;
+    }
+
+    /**
+     * @param string $message
+     * @return JsonResponse
+     */
+    public function respondNotAuthorized($message = '', $errors = '')
+    {
+        $message = $message === '' ? __('app.status.not_authorized') : $message;
+        return $this->setStatusCode(401)->respondWithError($message, $errors);
+    }
+
+    /**
+     * @param string $message
+     * @return JsonResponse
+     */
+    public function respondNotFound($message = '', $errors = '')
+    {
+        $message = $message === '' ? __('app.status.not_found') : $message;
+        return $this->setStatusCode(200)->respondWithError($message, $errors);
+    }
+
+    /**
+     * @param string $message
+     * @return JsonResponse
+     */
+    public function respondInternalError($message = '', $errors = '')
+    {
+        $message = $message === '' ? __('app.status.internal_error') : $message;
+        return $this->setStatusCode(500)->respondWithError($message, $errors);
+    }
+
+    /**
+     * @param string $message
+     * @return JsonResponse
+     */
+    public function respondForbidden($message = '', $errors = '')
+    {
+        $message = $message === '' ? __('app.status.forbidden') : $message;
+        return $this->setStatusCode(403)->respondWithError($message, $errors);
+    }
+
+    /**
+     * @param string $message
+     * @return JsonResponse
+     */
+    public function respondBadGateway($message = '', $errors = '')
+    {
+        $message = $message === '' ? __('app.status.bad_gateway') : $message;
+        return $this->setStatusCode(502)->respondWithError($message, $errors);
     }
 }

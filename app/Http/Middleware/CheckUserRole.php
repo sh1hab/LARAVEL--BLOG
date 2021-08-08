@@ -2,9 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Traits\RespondTrait;
 use Closure;
 use Illuminate\Http\Request;
-use App\Http\Traits\RespondTrait;
 
 class CheckUserRole
 {
@@ -20,7 +20,7 @@ class CheckUserRole
     public function handle($request, Closure $next)
     {
         $roles = $this->getRequiredRoleForRoute($request->route());
-        
+
         if (!$roles || $request->user()->hasRole($roles)) {
             return $next($request);
         }
@@ -30,6 +30,6 @@ class CheckUserRole
     private function getRequiredRoleForRoute($route)
     {
         $actions = $route->getAction();
-        return isset($actions['roles']) ? $actions['roles'] : null;
+        return $actions['roles'] ?? null;
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
 {
@@ -36,7 +36,7 @@ class AuthenticationTest extends TestCase
             'password' => 'password'
         ];
 
-        $response = $this->json('POST', '/api/v1/auth/login', $loginData);;
+        $response = $this->json('POST', '/api/v1/auth/login', $loginData);
         $response = json_decode($response->getContent());
 
         $token = $response->data->token;

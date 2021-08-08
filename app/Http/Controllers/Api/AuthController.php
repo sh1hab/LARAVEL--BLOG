@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Transformers\UserTransformer;
 use App\Http\Controllers\Controller;
-use App\Http\Traits\UploadTrait;
 use App\Http\Traits\RespondTrait;
+use App\Http\Traits\UploadTrait;
 use App\Models\User;
+use App\Transformers\UserTransformer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -23,7 +23,6 @@ class AuthController extends Controller
         $this->userTransformer = $userTransformer;
     }
 
-
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -39,12 +38,12 @@ class AuthController extends Controller
             ->first();
 
         if (empty($user)) {
-            return $this->respondNotFound('', __('app.user.not_found'));
+            return $this->respondNotFound('', __('app.credentials.not_found'));
         }
 
         // Check password
         if (!Hash::check($request->input('password'), $user->password)) {
-            return $this->respondNotAuthorized(__('app.password.not_valid'));
+            return $this->respondNotAuthorized(__('app.credentials.not_valid'));
         }
 
         // Generate token

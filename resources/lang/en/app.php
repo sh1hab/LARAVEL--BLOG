@@ -4,6 +4,9 @@ return [
     'create' => [
         'success' => 'Successfully saved data!',
     ],
+    'credentials' =>[
+      'not_found' => 'Please check your Email or Password is valid'
+    ],
     'delete' => [
         'success' => 'Successfully deleted data!',
     ],

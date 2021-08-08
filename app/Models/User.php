@@ -3,11 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\Role;
 
 class User extends Authenticatable
 {
@@ -46,11 +45,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function role()
-    {
-        return $this->belongsTo(Role::class);
-    }
-
     public function hasRole($roles)
     {
         $this->have_role = $this->getUserRole();
@@ -67,14 +61,19 @@ class User extends Authenticatable
         return false;
     }
 
-    private function checkIfUserHasRole($need_role)
-    {
-        return (strtolower($need_role) == strtolower($this->have_role->name)) ? true : false;
-    }
-
     private function getUserRole()
     {
         return $this->role()->getResults();
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    private function checkIfUserHasRole($need_role)
+    {
+        return (strtolower($need_role) == strtolower($this->have_role->name)) ? true : false;
     }
 
     public function author()
