@@ -195,11 +195,13 @@ class UserTest extends TestCase
         $response = $this->json('POST', '/api/v1/users', $data, $headers);
         $response = json_decode($response->getContent());
 
+        $password = $this->faker->password;
         $data = [
             'user_type' => UserTypes::getUserTypesArray()[mt_rand(0, count(UserTypes::getUserTypesArray()) - 1)],
             'name' => $this->faker->name,
             'email' => $this->faker->email,
-            'password' => $this->faker->password,
+            'password' => $password,
+            'password_confirmation' => $password,
         ];
         $response = $this->json('PUT', "/api/v1/users/{$response->data->user->id}", $data, $headers);
 
